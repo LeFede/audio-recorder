@@ -7,13 +7,13 @@
 
 
 
-#### Cómo levantar el proyecto
+## Cómo levantar el proyecto
 Para descargar el proyecto: 
 ```bash
 git clone https://github.com/LeFede/audio-recorder.git
 ```
 
-Actualizar las variables *(en caso de ser necesario)* de **".env example"** y renombrar a sólo **".env"**
+Actualizar las variables de **".env example"** y renombrar a sólo **".env"**
 
 Luego de clonado el proyecto ir a la carpeta raíz del proyecto y ejecutar la siguiente línea
 ```bash
@@ -29,10 +29,8 @@ Se levantará un [servidor](http://localhost:3000/) **local** en el puerto 3000
 
 
 
-
-
-**librerias utilizadas**
-*como levantar un proyecto*
-*como funciona*
-*mejoras futuras*
+**Mejoras futuras**:
+1. *Arreglar sobreescritura de audios*
+2. *Orden por filtros*
+3. *Arreglar fecha y hora*
 

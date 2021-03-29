@@ -1,2 +1,6 @@
-DB_URL=mongodb://localhost/audio-recorder
-DB_PORT=3000
+DB_URL=???
+DB_PORT=???
+
+AWS_ACCESS_KEY=???
+AWS_SECRET_KEY=???
+BUCKET_NAME=???
