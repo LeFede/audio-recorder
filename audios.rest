@@ -41,3 +41,13 @@ Content-Type: application/json
     "name": "ewewqqweqweudio",
     "audioFile": ""
 }
+
+###
+
+PUT  http://localhost:3000/api/audios/uploadS3
+Content-Type: application/json
+
+{
+    "name": "ewewqqweqweudio",
+    "audioFile": ""
+}

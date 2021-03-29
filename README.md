@@ -13,8 +13,7 @@ Para descargar el proyecto:
 git clone https://github.com/LeFede/audio-recorder.git
 ```
 
-
-Actualizar las variables de **".env example"** y renombrar a sólo **".env"**
+Actualizar las variables *(en caso de ser necesario)* de **".env example"** y renombrar a sólo **".env"**
 
 Luego de clonado el proyecto ir a la carpeta raíz del proyecto y ejecutar la siguiente línea
 ```bash
@@ -26,12 +25,9 @@ Para levantar el servidor:
 npm run dev
 ```
 
+Se levantará un [servidor](http://localhost:3000/) **local** en el puerto 3000
 
 
-Para compilar el proyecto
-```bash
-npm run build
-```
 
 
 

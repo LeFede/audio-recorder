@@ -33,7 +33,7 @@ app.use(express.static(path.join(__dirname, 'public')))
 
 
 
-app.listen(process.env.DB_PORT, () => console.log('Server started'))
+app.listen(process.env.DB_PORT, () => console.log(`Server started on port ${process.env.DB_PORT}`))
 //#endregion
 
 //#region Methods
@@ -43,6 +43,7 @@ function setupRouter(name) {
 //#endregion
 
 setupRouter('audios')
+
 
 
 

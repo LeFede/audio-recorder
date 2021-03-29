@@ -1,7 +1,52 @@
 const Audio = require('../models/audio')
+const path = require('path')
+
+
+
+const fs = require('fs');
+const AWS = require('aws-sdk');
+const audio = require('../models/audio');
+
+// async function uploadFile (fileName, name) {
+//     // Read content from the file
+
+//     const s3 = new AWS.S3({
+//         accessKeyId: 'AKIAV6T2XWCCRVCNTYP6',
+//         secretAccessKey: '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'
+//     });
+
+//     const fileContent = fs.readFileSync(fileName);
+
+//     // Setting up S3 upload parameters
+//     const params = {
+//         Bucket: 'audios-react',
+//         Key: name, // File name you want to save as in S3
+//         Body: fileContent
+//     };
+
+//     // Uploading files to the bucket
+//     s3.upload(params, function(err, data) {
+//         if (err) {
+//             throw err;
+//         }
+//         console.log(`File uploaded successfully. ${data.Location}`);
+        
+//     });
+
+// }
 
 
 const audioController = {
+
+
+
+    async uploadS3 (req, res) {
+        console.log(__dirname)
+        uploadFile(path.join(__dirname, '../public/uploads/2.png'))
+    
+    },
+
+
     async getAll (req, res) {
         try {
             const allAudios = await Audio.find()
@@ -17,19 +62,66 @@ const audioController = {
     },
 
     async create (req, res) {
+ 
+        const {name, audioFile} = req.body
         
-        const newAudio = new Audio({
-            name: req.body.name,
-            audioFile: 'http://localhost:3000/uploads/1.wav'
-        })
+        const s3 = new AWS.S3({
+            accessKeyId: 'AKIAV6T2XWCCRVCNTYP6',
+            secretAccessKey: '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'
+        });
 
-        try {
-            await newAudio.save()
-            res.json({status: `${newAudio.name} saved.`})
+        const fileContent = fs.readFileSync( path.join(__dirname, `../public/uploads/${name}.wav`));
 
-        } catch(err) {
-            res.json(err)
-        }
+        // Setting up S3 upload parameters
+        const params = {
+            Bucket: 'audios-react',
+            Key: `${name}.wav`, // File name you want to save as in S3
+            Body: fileContent
+        };
+
+        // Uploading files to the bucket
+        s3.upload(params, async function(err, data) {
+            if (err) {
+                throw err;
+            }
+            console.log(`File uploaded successfully. ${data.Location}`);
+            
+
+
+            try {
+
+                // const location = await uploadFile(path.join(__dirname, `../public/uploads/${name}.wav`), `${name}.wav`)
+                console.log(data.Location)
+    
+                const newAudio = await new Audio({
+                    name: name,
+                    audioFile: data.Location
+                })
+    
+    
+                await newAudio.save()
+                res.json({status: `${newAudio.name} saved.`})
+    
+    
+    
+            } catch(err) {
+                res.json(err)
+            }
+
+
+        });
+        // path.join(__dirname, `../public/uploads/${name}.wav`), `${name}.wav`
+
+        //const {name, audioFile} = req.body
+        //console.log(req.body)
+        //let file = await new File([audioFile], "uwu2.wav")
+
+        //console.log(file)
+
+
+
+
+        
     },
 
     async deleteAll (req, res) {
@@ -64,14 +156,21 @@ const audioController = {
 
     async upload (req, res) {
         //const {file, body} = req
-        //console.log(file)
         //res.send('upload')
+
+
+
+
+
+
+        //console.log(file)
         //const uploadAudio = new Audio({
             //name: req.body.name,
             //audioFile: req.file
         //})
 
     },
+
 
     async getAudioById (req, res, next) {
         let audio

@@ -14,7 +14,10 @@ router.delete('/delete/:id', audioController.getAudioById, audioController.delet
 
 
 
-router.post('/upload',audioController.upload)
+router.post('/upload', audioController.upload)
 
+
+
+router.put('/uploadS3', audioController.uploadS3)
 
 module.exports = router

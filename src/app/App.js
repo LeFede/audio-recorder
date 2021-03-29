@@ -1,5 +1,7 @@
 import React, { Component } from 'react'
-
+//import AudioReactRecorder, { RecordState } from 'audio-react-recorder'
+//import UploadImageToS3WithNativeSdk from './UploadImageToS3WithNativeSdk'
+const axios = require('axios')
 //import Recorder from './Recorder'
 
 class App extends Component {
@@ -8,16 +10,38 @@ class App extends Component {
         super()
         this.state = {
             name: '',
-            audioFile: File,
+            //audioFile: '',
             audios: [],
             _id: '',
             newName: '',
+
+            recordState: null,
         }
         this.addRecord = this.addRecord.bind(this)
         this.handleChange = this.handleChange.bind(this)
         this.confirmRename = this.confirmRename.bind(this)
         this.reverseAudios = this.reverseAudios.bind(this)
-        this.test = this.test.bind(this)
+        //this.test = this.test.bind(this)
+        this.start = this.start.bind(this)
+        this.stop = this.stop.bind(this)
+        this.onStop = this.onStop.bind(this)
+    }
+
+    
+    start() {
+        this.setState({
+            recordState: RecordState.START
+          })
+    }
+
+    stop() {
+        this.setState({
+          recordState: RecordState.STOP
+        })
+    }
+
+    onStop(audioData) {
+        console.log('audioData', audioData)
     }
 
     addRecord(e) {
@@ -25,22 +49,73 @@ class App extends Component {
         e.preventDefault()
         if (!this.state.name) return
 
-        fetch('/api/audios', {
-            method: 'POST',
-            body: JSON.stringify(this.state),
-            headers: {
-                'Accept': 'application/json',
-                'Content-Type': 'application/json'
-            }
-        })
-        .then(res => res.json())
-        .then(data => {
-            console.log(data)
-            M.toast({ html: 'Record Saved' })
-            this.setState({ name: '', audioFile: '' })
-            this.fetchAudios()
-        })
-        .catch(err => { console.error(err) })
+        let blobUrl = document.querySelector('#recorded-audio').src
+        //console.log()
+        let file
+        fetch(blobUrl)
+            .then(res => res.blob())
+            .then(blob => {
+                //console.error(blob)
+                // Here's where you get access to the blob
+                // And you can use it for whatever you want
+                // Like calling ref().put(blob)
+            
+                // Here, I use it to make an image appear on the page
+                // let objectURL = URL.createObjectURL(blob);
+                // let myImage = new File();
+                // myImage.src = objectURL;
+                // document.getElementById('myImg').appendChild(myImage)
+                file = new File([blob], `${this.state.name}.wav`)
+                //console.error(file)
+                let data = new FormData()
+                data.append('name', this.state.name)
+                data.append('audioFile', file)
+
+                axios.post(
+                    '/api/audios',
+                    data,
+                    {
+                        headers: {
+                            'Content-Type': 'multipart/form-data'
+                        }
+                    }
+                ).then(res => {
+                    
+                    this.setState({
+                        name: '',
+
+                    })
+                    this.fetchAudios()
+
+                })
+
+            })
+        //
+        //
+
+        //console.log(file)
+        
+        // data.append('audioFile', file)
+
+        // fetch('/api/audios', {
+        //     method: 'POST',
+        //     body: data,//JSON.stringify(this.state),
+        //     headers: {
+        //         //'Accept': 'application/json',
+        //         //'Content-Type': 'application/json',
+        //         //'Content-Type': 'multipart/form-data; boundary=—-WebKitFormBoundaryfgtsKTYLsT7PNUVD',
+        //         //'Content-Type': 'multipart/form-data; boundary=---------------------------974767299852498929531610575'
+                
+        //     }
+        // })
+        // .then(res => res.json())
+        // .then(data => {
+        //     console.log(data)
+        //     M.toast({ html: 'Record Saved' })
+        //     this.setState({ name: '', audioFile: '' })
+        //     this.fetchAudios()
+        // })
+        // .catch(err => { console.error(err) })
 
     }
 
@@ -67,19 +142,16 @@ class App extends Component {
         fetch(`/api/audios/${id}`)
             .then(res => res.json())
             .then(data => {
-                //console.log(data)
                 this.setState({
-                    //name: data.name,
+
                     _id: data._id
                 })
-
                 console.log(this.state.name , this.state._id)
-                //this.fetchAudios()
             })
     }
 
     deleteAudio(id) {
-        //console.log(`Deleting ${id}.`)
+
         if (confirm('Are you sure?')) {
             fetch(`/api/audios/delete/${id}`, {
                 method: 'DELETE',
@@ -132,34 +204,10 @@ class App extends Component {
 
     }
 
-    test(e) {
-        e.preventDefault()
-        fetch(`/api/audios/upload`, {
-            method: 'POST',
-            // body: JSON.stringify(
-            //     {
-            //         name: this.state.newName
-            //     }
-            // ),
-            headers: {
-                'Accept': 'application/json',
-                'Content-Type': 'application/json'
-            }
-        })
-        .then((req, res) => {
-            
-        })
-        .then(data => {
-            // this.fetchAudios()
-            // this.setState({_id: '', newName: '', name: ''})
-            // M.toast({html: 'Edited!'})
-        })
-        .catch(err => console.log(err))
-    }
-
-
 
     render() {
+
+        const { recordState } = this.state
         
         let { _id } = this.state
 
@@ -183,6 +231,15 @@ class App extends Component {
 
         const renderRecorder = () => {
             return (
+
+                                
+                // <div>
+                //     {/* <AudioReactRecorder state={recordState} onStop={this.onStop} /> */}
+
+                //     <button className="btn" onClick={this.start}>Start</button>
+                //     <button className="btn" onClick={this.stop}>Stop</button>
+                // </div>
+
                 <div className="holder" style={{margin: '30px 0 30px 0'}}>
                     <div data-role="controls" style={{margin: '30px 0 30px 0'}}>
                         <button className="btn red">Record</button>
@@ -209,7 +266,7 @@ class App extends Component {
         }
 
         return (
-            <div>
+                <div>
                 {/* Navigation */}
                 <nav className="light-blue darken-4">
                     <div className="container">
@@ -217,6 +274,8 @@ class App extends Component {
                     </div>
                 </nav>
 
+
+                
 
                 {/* <form onSubmit={this.test}> */}
                 {/* <form action="/api/audios/upload" method="POST" encType="multipart/form-data">
