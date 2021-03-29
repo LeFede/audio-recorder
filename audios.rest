@@ -1,0 +1,43 @@
+GET http://localhost:3000/api/audios
+
+
+###
+
+
+GET http://localhost:3000/api/audios/605f5372d3b180262470bea3
+
+
+###
+
+
+POST http://localhost:3000/api/audios
+Content-Type: application/json
+
+{
+    "name": "Audio",
+    "audioFile": "http://localhost:3000/uploads/1.wav"
+}
+
+
+###
+
+
+DELETE http://localhost:3000/api/audios/delete
+
+
+###
+
+
+DELETE http://localhost:3000/api/audios/delete/605f4cbbb8fb1c31f4a11720
+
+
+###
+
+
+PATCH  http://localhost:3000/api/audios/605f959f3c22f607a472c0dd
+Content-Type: application/json
+
+{
+    "name": "ewewqqweqweudio",
+    "audioFile": ""
+}

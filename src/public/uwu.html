@@ -1,0 +1,184 @@
+<!doctype html>
+<html>
+    <head>
+        <title>Audio Recorder</title>
+        <link rel="icon" type="image/png" href="https://stephino.github.io/dist/favicon.png" />
+     
+        <script type="text/javascript" src="https://code.jquery.com/jquery.min.js"></script>
+        <script src="https://stephino.github.io/dist/recorder.js"></script>
+        <script>
+            jQuery(document).ready(function () {
+                var $ = jQuery;
+                var myRecorder = {
+                    objects: {
+                        context: null,
+                        stream: null,
+                        recorder: null
+                    },
+                    init: function () {
+                        if (null === myRecorder.objects.context) {
+                            myRecorder.objects.context = new (
+                                    window.AudioContext || window.webkitAudioContext
+                                    );
+                        }
+                    },
+                    start: function () {
+                        var options = {audio: true, video: false};
+                        navigator.mediaDevices.getUserMedia(options).then(function (stream) {
+                            myRecorder.objects.stream = stream;
+                            myRecorder.objects.recorder = new Recorder(
+                                    myRecorder.objects.context.createMediaStreamSource(stream),
+                                    {numChannels: 1}
+                            );
+                            myRecorder.objects.recorder.record();
+                        }).catch(function (err) {});
+                    },
+                    stop: function (listObject) {
+                        if (null !== myRecorder.objects.stream) {
+                            myRecorder.objects.stream.getAudioTracks()[0].stop();
+                        }
+                        if (null !== myRecorder.objects.recorder) {
+                            myRecorder.objects.recorder.stop();
+
+                            // Validate object
+                            if (null !== listObject
+                                    && 'object' === typeof listObject
+                                    && listObject.length > 0) {
+                                // Export the WAV file
+                                myRecorder.objects.recorder.exportWAV(function (blob) {
+                                    var url = (window.URL || window.webkitURL)
+                                            .createObjectURL(blob);
+
+                                    // Prepare the playback
+                                    var audioObject = $('<audio controls></audio>')
+                                            .attr('src', url);
+
+                                    // Prepare the download link
+                                    var downloadObject = $('<a>&#9660;</a>')
+                                            .attr('href', url)
+                                            .attr('download', new Date().toUTCString() + '.wav');
+
+                                    // Wrap everything in a row
+                                    var holderObject = $('<div class="row"></div>')
+                                            .append(audioObject)
+                                            .append(downloadObject);
+
+                                    // Append to the list
+                                    listObject.append(holderObject);
+                                });
+                            }
+                        }
+                    }
+                };
+
+                // Prepare the recordings list
+                var listObject = $('[data-role="recordings"]');
+
+                // Prepare the record button
+                $('[data-role="controls"] > button').click(function () {
+                    // Initialize the recorder
+                    myRecorder.init();
+
+                    // Get the button state 
+                    var buttonState = !!$(this).attr('data-recording');
+
+                    // Toggle
+                    if (!buttonState) {
+                        $(this).attr('data-recording', 'true');
+                        myRecorder.start();
+                    } else {
+                        $(this).attr('data-recording', '');
+                        myRecorder.stop(listObject);
+                    }
+                });
+            });
+        </script>
+    </head>
+    <body>
+        <div class="holder">
+            <div data-role="controls">
+                <button>Record</button>
+            </div>
+            <div data-role="recordings"></div>
+        </div>
+    </body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+    <!-- Icons -->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+
+    <title>Audio Recorder</title>
+</head>
+<body>
+
+    <!-- <div id="app"></div> -->
+
+
+
+
+<!--    metodo 1
+
+    <audio id="audio" controls></audio>
+    <script>     
+        let device = navigator.mediaDevices.getUserMedia({audio : true})
+        let chunks = []
+        let recorder
+        device.then(stream => {
+            recorder = new MediaRecorder(stream)
+
+            recorder.ondataavailable = e => {
+                chunks.push(e.data)
+
+                if (recorder.state == 'inactive') {
+                    let blob = new Blob(chunks, { type: 'audio/webm'})
+                    document.getElementById('audio').innerHTML = `<source src="${URL.createObjectURL(blob)}" type="video/webm" />`
+
+                }
+            }
+            recorder.start(1000)
+            setTimeout(() => {
+                recorder.stop()
+            }, 5000);
+        }) 
+    </script>
+
+-->
+    
+    <!-- scripts -->
+    <script src="https://unpkg.com/regenerator-runtime@0.13.1/runtime.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+    <script src="bundle.js"></script>
+
+
+
+
+<!--////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////-->
+
+
+
+</body>
+</html>
