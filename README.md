@@ -13,6 +13,7 @@ Para descargar el proyecto:
 git clone https://github.com/LeFede/audio-recorder.git
 ```
 
+
 Actualizar las variables de **".env example"** y renombrar a sólo **".env"**
 
 Luego de clonado el proyecto ir a la carpeta raíz del proyecto y ejecutar la siguiente línea
