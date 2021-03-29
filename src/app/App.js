@@ -4,69 +4,47 @@ import React, { Component } from 'react'
 const axios = require('axios')
 //import Recorder from './Recorder'
 
+
 class App extends Component {
 
     constructor() {
         super()
         this.state = {
             name: '',
-            //audioFile: '',
             audios: [],
             _id: '',
             newName: '',
-
-            recordState: null,
+            adding: false,
+            //recording: false,
+            search: '',
+            searchedAudios: [],
         }
+
+        //Preguntar: quise hacer las funciones anónimas pero daba error, por ende tuve que bindear de esta manera
         this.addRecord = this.addRecord.bind(this)
         this.handleChange = this.handleChange.bind(this)
         this.confirmRename = this.confirmRename.bind(this)
         this.reverseAudios = this.reverseAudios.bind(this)
-        //this.test = this.test.bind(this)
-        this.start = this.start.bind(this)
-        this.stop = this.stop.bind(this)
-        this.onStop = this.onStop.bind(this)
+        this.handleSearch = this.handleSearch.bind(this)
+
     }
 
-    
-    start() {
-        this.setState({
-            recordState: RecordState.START
-          })
-    }
-
-    stop() {
-        this.setState({
-          recordState: RecordState.STOP
-        })
-    }
-
-    onStop(audioData) {
-        console.log('audioData', audioData)
-    }
 
     addRecord(e) {
 
         e.preventDefault()
         if (!this.state.name) return
+        if (document.querySelector('#recorded-audio') == null) return M.toast({html: 'Please record something!'})
 
+        this.setState({adding: true})
         let blobUrl = document.querySelector('#recorded-audio').src
-        //console.log()
         let file
+
         fetch(blobUrl)
             .then(res => res.blob())
             .then(blob => {
-                //console.error(blob)
-                // Here's where you get access to the blob
-                // And you can use it for whatever you want
-                // Like calling ref().put(blob)
-            
-                // Here, I use it to make an image appear on the page
-                // let objectURL = URL.createObjectURL(blob);
-                // let myImage = new File();
-                // myImage.src = objectURL;
-                // document.getElementById('myImg').appendChild(myImage)
+                
                 file = new File([blob], `${this.state.name}.wav`)
-                //console.error(file)
                 let data = new FormData()
                 data.append('name', this.state.name)
                 data.append('audioFile', file)
@@ -85,37 +63,14 @@ class App extends Component {
                         name: '',
 
                     })
+
+                    document.querySelector('[data-role=recordings]').innerHTML = ''
+                    this.state.adding = false
                     this.fetchAudios()
 
                 })
 
             })
-        //
-        //
-
-        //console.log(file)
-        
-        // data.append('audioFile', file)
-
-        // fetch('/api/audios', {
-        //     method: 'POST',
-        //     body: data,//JSON.stringify(this.state),
-        //     headers: {
-        //         //'Accept': 'application/json',
-        //         //'Content-Type': 'application/json',
-        //         //'Content-Type': 'multipart/form-data; boundary=—-WebKitFormBoundaryfgtsKTYLsT7PNUVD',
-        //         //'Content-Type': 'multipart/form-data; boundary=---------------------------974767299852498929531610575'
-                
-        //     }
-        // })
-        // .then(res => res.json())
-        // .then(data => {
-        //     console.log(data)
-        //     M.toast({ html: 'Record Saved' })
-        //     this.setState({ name: '', audioFile: '' })
-        //     this.fetchAudios()
-        // })
-        // .catch(err => { console.error(err) })
 
     }
 
@@ -127,7 +82,6 @@ class App extends Component {
         fetch('/api/audios')
             .then(res => res.json())
             .then(data => {
-                //console.log(data)
                 this.setState({ audios: data })
             })
     }
@@ -146,7 +100,6 @@ class App extends Component {
 
                     _id: data._id
                 })
-                console.log(this.state.name , this.state._id)
             })
     }
 
@@ -173,7 +126,6 @@ class App extends Component {
 
     handleChange(e) {
         const { name, value } = e.target
-        console.log(name, value)
         this.setState({
             [name]: value
         })
@@ -204,6 +156,38 @@ class App extends Component {
 
     }
 
+    clickedRecordButton(){
+        document.querySelector('[data-role=recordings]').innerHTML = ''
+    }
+
+    handleSearch(e){
+        e.preventDefault()
+        if (this.state.search == '') {
+            M.toast({html: `Showing Everything!`})
+            return this.fetchAudios()
+        }
+
+        fetch(`/api/audios/search/${this.state.search}`, {
+            method: 'GET',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            }
+        })
+            .then(res => res.json())
+            .then(data => {
+                this.setState({ audios: data })
+
+
+                M.toast({html: `Current search: "${this.state.search}"`})
+
+                this.setState({
+                    search: ''
+                })
+
+            })
+    }
+
 
     render() {
 
@@ -230,23 +214,19 @@ class App extends Component {
         }
 
         const renderRecorder = () => {
-            return (
+            if (true) 
+                return <button className="btn red" onClick={() => {this.clickedRecordButton()}}>Record</button> 
 
-                                
-                // <div>
-                //     {/* <AudioReactRecorder state={recordState} onStop={this.onStop} /> */}
+            return <button className="btn red">Recording...</button>  
+            
+        }
 
-                //     <button className="btn" onClick={this.start}>Start</button>
-                //     <button className="btn" onClick={this.stop}>Stop</button>
-                // </div>
-
-                <div className="holder" style={{margin: '30px 0 30px 0'}}>
-                    <div data-role="controls" style={{margin: '30px 0 30px 0'}}>
-                        <button className="btn red">Record</button>
-                    </div>
-                    <div data-role="recordings"></div>
-                </div>
-            )
+        const renderAddButton = () => {
+            if (this.state.adding == true)
+                return <div><button type="submit" disabled className="btn green darken-4">Adding</button></div>
+            
+            return <div><button type="submit" className="btn darken-4">Add</button></div>
+            
         }
 
         const renderAudio = (audio) => {
@@ -301,7 +281,7 @@ class App extends Component {
 
                                             </div>
                                         </div>
-                                        <button type="submit" className="btn darken-4">Add</button>
+                                        {renderAddButton()}
     
                                     </form>
 
@@ -310,7 +290,14 @@ class App extends Component {
 
                             <div className="card">
                                 <div className="card-content">
+
+                                <div className="holder" style={{margin: '30px 0 30px 0'}}>
+                                    <div data-role="controls" style={{margin: '30px 0 30px 0'}}>
                                     {renderRecorder()}
+
+                                    </div>
+                                        <div data-role="recordings"></div>
+                                    </div>
                                 </div>
 
                             </div>
@@ -322,6 +309,13 @@ class App extends Component {
                             
                         </div>
                         <div className="col s7">
+                            <div>
+                                <form onSubmit={this.handleSearch}>
+                                    <input placeholder="Search audio by name" name="search" onChange={this.handleChange} value={this.state.search} type="text" />
+                                    
+                                    
+                                </form>
+                            </div>
                             <table>
                                 <thead>
                                     <tr>
