@@ -1,0 +1,2 @@
+DB_URL=mongodb://localhost/audio-recorder
+DB_PORT=3000
