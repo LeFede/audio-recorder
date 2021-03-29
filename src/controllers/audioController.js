@@ -29,11 +29,6 @@ const audioController = {
     async create (req, res) {
  
         const {name, audioFile} = req.body
-
-        // const doesAudioExist = await Audio.find({name: name})
-
-        // if (doesAudioExist)
-        //     return console.log('Audio already exists')
         
         const s3 = new AWS.S3({
             accessKeyId: process.env.AWS_ACCESS_KEY,
@@ -51,14 +46,12 @@ const audioController = {
             Body: fileContent
         };
 
-
-
         // Uploading files to the bucket
         s3.upload(params, async function(err, data) {
             if (err) {
                 throw err;
             }
-            console.log(`File uploaded successfully. ${data.Location}`);
+            //console.log(`File uploaded successfully. ${data.Location}`);
             
             const newAudio = new Audio({
                 name: name,

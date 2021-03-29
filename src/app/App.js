@@ -115,7 +115,7 @@ class App extends Component {
             })
                 .then(res => res.json())
                 .then(data => {
-                    console.log(data)
+                    //console.log(data)
                     M.toast({ html: 'Audio Deleted' })
                     this.fetchAudios()
                 })
@@ -133,7 +133,7 @@ class App extends Component {
 
     confirmRename(ele) {
         ele.preventDefault()
-        console.log(`${this.state._id}`)
+        //console.log(`${this.state._id}`)
         fetch(`/api/audios/${this.state._id}`, {
             method: 'PATCH',
             body: JSON.stringify(
